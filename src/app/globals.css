@@ -102,9 +102,18 @@ a {
 }
 
 @layer components {
+  .icon {
+    @apply p-2 rounded-full transition-all hover:bg-[rgba(255,255,255,0.3)];
+  }
+
   .pokemon-searchfield {
     @apply w-full text-neutral-950 p-3 rounded-3xl shadow-inner;
   }
+
+  .scrollable-poks-container {
+    @apply m-1 overflow-auto px-3 pt-5 rounded-lg bg-white h-[80vh];
+  }
+
   .poks-container {
     @apply grid grid-cols-2 gap-3;
   }

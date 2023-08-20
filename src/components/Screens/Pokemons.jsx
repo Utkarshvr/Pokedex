@@ -6,50 +6,96 @@ import { useEffect, useState } from "react";
 import loader from "@/assets/others/loading.svg";
 
 import Image from "next/image";
+import InfiniteScroll from "react-infinite-scroller";
 
-const Loading = () => {
+const Loading = ({ small }) => {
   return (
-    <div className="flex flex-col gap-2 h-full items-center justify-center">
-      <Image width={80} height={80} alt="pokemon" src={loader} />
-      <h6 className="text-red-600 font-bold text-2xl">LOADING</h6>
+    <div
+      className={`flex flex-col w-full gap-2  ${
+        small ? "" : "h-full"
+      } items-center justify-center`}
+    >
+      <Image
+        width={small ? 40 : 80}
+        height={small ? 40 : 80}
+        alt="pokemon"
+        src={loader}
+      />
+      <h6
+        className={`text-red-600 font-bold ${small ? "text-lg" : "text-2xl"}`}
+      >
+        LOADING
+      </h6>
     </div>
   );
 };
 
 export default function Pokemons() {
   const [pokemons, setPokemons] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+
+  // console.log({ pokemons, page, hasMore });
+
+  const fetchPoks = async () => {
+    const apiUrl = `https://pokeapi.co/api/v2/pokemon/?offset=${
+      page * 20
+    }&limit=20`;
+    // console.log(apiUrl);
+
+    try {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      const promises = data.results.map((pokemon) =>
+        fetch(pokemon.url).then((response) => response.json())
+      );
+
+      const pokemonData = await Promise.all(promises);
+
+      setPokemons((prev) =>
+        [...prev, ...pokemonData].sort((a, b) => a.id - b.id)
+      );
+
+      setPage((prev) => prev + 1);
+
+      // Check if there's a "next" URL in the response
+      const hasNextPage = Boolean(data.next);
+
+      // Only set hasMore to true if there's a next page
+      setHasMore(hasNextPage);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   useEffect(() => {
-    const apiUrl = `https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20`;
-
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        const promises = data.results.map((pokemon) => {
-          return fetch(pokemon.url)
-            .then((response) => response.json())
-            .then((pokemonData) => {
-              setPokemons((prev) => [...prev, pokemonData]);
-            });
-        });
-
-        // Wait for all individual Pokemon requests to complete
-        return Promise.all(promises);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    // console.log("effect wala fetcher");
+    fetchPoks();
   }, []);
 
-  return (
-    <div className="m-1 overflow-auto px-3 pt-5 rounded-lg bg-white h-[80vh]">
-      {pokemons?.length === 0 ? <Loading /> : null}
+  const loadMore = () => {
+    // console.log("FETCHING POKS");
+    fetchPoks();
+  };
 
-      <PoksContainer>
-        {pokemons?.map((pokemon) => (
-          <PokemonCard key={pokemon.id} pokemon={pokemon} />
-        ))}
-      </PoksContainer>
+  return (
+    <div className="scrollable-poks-container">
+      <InfiniteScroll
+        className="h-full"
+        pageStart={0}
+        loadMore={loadMore}
+        hasMore={hasMore}
+        loader={<Loading small />}
+        useWindow={false}
+      >
+        {pokemons?.length === 0 ? <Loading /> : null}
+        <PoksContainer>
+          {pokemons?.map((pokemon) => (
+            <PokemonCard key={pokemon.id} pokemon={pokemon} />
+          ))}
+        </PoksContainer>
+      </InfiniteScroll>
     </div>
   );
 }

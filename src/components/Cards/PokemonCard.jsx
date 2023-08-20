@@ -1,12 +1,17 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function PokemonCard({ pokemon }) {
   return (
-    <div className="pok-card">
+    <Link href={`/${pokemon?.id}`} className="pok-card">
       <div className="flex justify-end py-1 px-2">
         <p className="text-neutral-500 font-medium">
           {"#"}
-          {pokemon?.id}
+          {pokemon?.id < 100 && pokemon?.id > 10
+            ? `0${pokemon.id}`
+            : pokemon?.id < 100 && pokemon?.id < 10
+            ? `00${pokemon.id}`
+            : pokemon.id}
         </p>
       </div>
       <div className="pok-detials">
@@ -20,6 +25,6 @@ export default function PokemonCard({ pokemon }) {
         </div>
         <p className="text-neutral-950 font-semibold">{pokemon?.name}</p>
       </div>
-    </div>
+    </Link>
   );
 }
