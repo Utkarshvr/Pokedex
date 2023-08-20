@@ -16,7 +16,7 @@ export default function BaseStatus({ color, stats }) {
 
       <div className="flex flex-col w-full gap-1">
         {stats?.map(({ base_stat }) => (
-          <div className="flex items-center gap-2">
+          <div key={base_stat?.stat?.name} className="flex items-center gap-2">
             <h6
               key={base_stat?.stat?.name}
               className="text-neutral-900 text-sm font-medium"
