@@ -2,13 +2,14 @@
 
 import PokLongCard from "@/components/Cards/PokLongCard";
 import PokHeader from "@/components/Header/PokHeader";
+import Loading from "@/components/Screens/Loading";
 import typeColors from "@/config/colors";
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function PokemonPage() {
-  const pokId = usePathname().split("/")[1];
+  const pokId = usePathname().split("pokemons/")[1];
   const [pokemon, setPokemon] = useState(null);
   const [color, setColor] = useState("");
 
@@ -40,17 +41,15 @@ export default function PokemonPage() {
     }
   }, [pokemon]);
   // 74CB48
-  return (
+  return pokemon ? (
     <main
       style={{ backgroundColor: color }}
-      className={`flex flex-col justify-between w-full max-w-lg min-h-screen`}
+      className={`overflow-hidden flex flex-col justify-between w-full max-w-lg min-h-screen`}
     >
-      {pokemon ? (
-        <>
-          <PokHeader color={color} pokemon={pokemon} />
-          <PokLongCard color={color} pokemon={pokemon} />
-        </>
-      ) : null}
+      <PokHeader color={color} pokemon={pokemon} />
+      <PokLongCard pokId={pokId} color={color} pokemon={pokemon} />
     </main>
+  ) : (
+    <Loading />
   );
 }

@@ -3,32 +3,9 @@ import PoksContainer from "../Container/PoksContainer";
 import PokemonCard from "../Cards/PokemonCard";
 
 import { useEffect, useState } from "react";
-import loader from "@/assets/others/loading.svg";
 
-import Image from "next/image";
 import InfiniteScroll from "react-infinite-scroller";
-
-const Loading = ({ small }) => {
-  return (
-    <div
-      className={`flex flex-col w-full gap-2  ${
-        small ? "" : "h-full"
-      } items-center justify-center`}
-    >
-      <Image
-        width={small ? 40 : 80}
-        height={small ? 40 : 80}
-        alt="pokemon"
-        src={loader}
-      />
-      <h6
-        className={`text-red-600 font-bold ${small ? "text-lg" : "text-2xl"}`}
-      >
-        LOADING
-      </h6>
-    </div>
-  );
-};
+import Loading from "./Loading";
 
 export default function Pokemons() {
   const [pokemons, setPokemons] = useState([]);
@@ -86,10 +63,10 @@ export default function Pokemons() {
         pageStart={0}
         loadMore={loadMore}
         hasMore={hasMore}
-        loader={<Loading small />}
+        loader={<Loading small inContainer />}
         useWindow={false}
       >
-        {pokemons?.length === 0 ? <Loading /> : null}
+        {pokemons?.length === 0 ? <Loading inContainer /> : null}
         <PoksContainer>
           {pokemons?.map((pokemon) => (
             <PokemonCard key={pokemon.id} pokemon={pokemon} />
